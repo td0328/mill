@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.myth.system.mapper.SysStateClassMapper">
+    <select id="getAllSysStateClass" resultType="com.myth.system.bean.SysStateClass">
+        select * from sys_state_class
+    </select>
+    <insert id="insertSysStateClass" parameterType="com.myth.system.bean.SysStateClass">
+        INSERT INTO sys_state_class
+            ( name)
+        VALUES
+            (#{name})
+    </insert>
+    <update id="updateSysStateClass" parameterType="com.myth.system.bean.SysStateClass">
+        update sys_state_class set name = #{name} where id = #{id}
+    </update>
+    <delete id="deleteSysStateClass" parameterType="com.myth.system.bean.SysStateClass">
+        delete from sys_state_class where id = #{id}
+    </delete>
+    <delete id="deleteSysStateByClassId" parameterType="com.myth.system.bean.SysState">
+        delete from sys_state where class_id = #{classId}
+    </delete>
+    <select id="getAllSysStateByClassId" resultType="com.myth.system.bean.SysState">
+        select * from sys_state where class_id = #{classId} order by value
+    </select>
+    <insert id="insertSysState" parameterType="com.myth.system.bean.SysState">
+        INSERT INTO sys_state
+            (class_id,value,name)
+        VALUES
+            (#{classId},#{value},#{name})
+    </insert>
+    <update id="updateSysState" parameterType="com.myth.system.bean.SysState">
+        update sys_state set value = #{value},name = #{name} where id = #{id}
+    </update>
+    <delete id="deleteSysState" parameterType="com.myth.system.bean.SysState">
+        delete from sys_state where id in
+        <foreach collection="ids" item="id"  separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+    <select id="getSysStateByClassIdAndValue" resultType="com.myth.system.bean.SysState">
+        select * from sys_state where class_id = #{classId} and value = #{value}
+    </select>
+</mapper>
