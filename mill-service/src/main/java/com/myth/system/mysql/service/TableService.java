@@ -1,6 +1,7 @@
 package com.myth.system.mysql.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.myth.system.bean.SysDictClass;
 import com.myth.system.bean.SysStateClass;
 import com.myth.system.bean.SysTableConfig;
 import com.myth.system.mysql.bean.SysKeyColumnUsage;

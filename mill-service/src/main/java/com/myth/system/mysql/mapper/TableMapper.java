@@ -1,11 +1,11 @@
 package com.myth.system.mysql.mapper;
 
+import com.myth.system.bean.SysDictClass;
 import com.myth.system.bean.SysStateClass;
 import com.myth.system.bean.SysTableConfig;
 import com.myth.system.mysql.bean.SysKeyColumnUsage;
 import com.myth.system.mysql.bean.SysTable;
 import com.myth.system.mysql.bean.SysTableColumn;
-import com.myth.system.table.*;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;

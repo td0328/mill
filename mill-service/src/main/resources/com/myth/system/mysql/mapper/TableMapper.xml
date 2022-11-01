@@ -36,7 +36,7 @@
     <select id="getTableColumnByName" resultType="com.myth.system.mysql.bean.SysTableColumn">
         SELECT * from information_schema.COLUMNS where table_schema = #{tableSchema} and table_name = #{tableName} and column_name = #{columnName};
     </select>
-    <select id="getDictClassAll" resultType="com.myth.system.table.SysDictClass">
+    <select id="getDictClassAll" resultType="com.myth.system.bean.SysDictClass">
         SELECT * from sys_dict_class
     </select>
     <select id="getStateClassAll" resultType="com.myth.system.bean.SysStateClass">
