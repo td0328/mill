@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.myth.system.mapper.SysMenuMapper">
+    <select id="getTreeSysMenu" resultMap="treeSysMenuVo">
+        select id,title,'treeMenu' class_name from sys_menu where pid is null order by sort
+    </select>
+    <select id="getTreeSysMenuChildrenByPid" resultMap="treeSysMenuChildrenVo">
+        select id,title,'treeSubmenu' class_name from sys_menu where pid = #{pid} order by sort
+    </select>
+    <insert id="addSysMenu" parameterType="com.myth.system.bean.SysMenu">
+        INSERT INTO sys_menu
+            (pid,icon,title,type,table_name,page_name,sort)
+        VALUES
+            (#{pid},#{icon},#{title},#{type},#{tableName},#{pageName},#{sort})
+    </insert>
+    <update id="editSysMenu" parameterType="com.myth.system.bean.SysMenu">
+        update sys_menu set pid = #{pid},icon = #{icon},title = #{title},type = #{type},table_name = #{tableName},page_name = #{pageName},sort = #{sort} where id = #{id}
+    </update>
+    <delete id="deleteSysMenuByIds" parameterType="com.myth.system.bean.SysMenu">
+        delete from sys_menu where id in
+        <foreach collection="ids" item="id"  separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+    <delete id="deleteSysMenuByPid" parameterType="com.myth.system.bean.SysMenu">
+        delete from sys_menu where pid in
+        <foreach collection="ids" item="id"  separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+    <select id="getAllSysMenu" resultMap="mySysMenuMap">
+        SELECT x.*,y.id childrenId,y.pid childrenPid,y.icon childrenIcon,y.title childrenTitle,y.type childrenType,y.table_name childrenTableName,y.page_name childrenPageName,y.sort childrenSort
+        FROM sys_menu AS x
+        LEFT JOIN sys_menu AS y ON y.pid = x.id
+        WHERE x.pid is null ORDER BY x.sort ,y.sort
+    </select>
+    <select id="getSysMenuByUserId" resultMap="mySysMenuMap">
+        SELECT distinct sm.*,psm.id childrenId,psm.pid childrenPid,psm.icon childrenIcon,psm.title childrenTitle,psm.type childrenType,psm.table_name childrenTableName,psm.page_name childrenPageName,psm.sort childrenSort from sys_user_role_relation ur
+            left JOIN sys_role_menu_relation rm ON ur.role_id = rm.role_id
+            left JOIN sys_menu psm on rm.menu_id = psm.id
+            left join sys_menu sm ON psm.pid = sm.id
+        where ur.user_id=#{userId} and psm.pid is not null ORDER BY sm.sort,psm.sort
+    </select>
+    <select id="getSysMenuById" resultType="com.myth.system.bean.SysMenu">
+        select * from sys_menu where id = #{id}
+    </select>
+    <resultMap id="mySysMenuMap" type="com.myth.system.vo.SysMenuVo">
+        <id property="id" column="id"/>
+        <result property="pid" column="pid"/>
+        <result property="icon" column="icon"/>
+        <result property="title" column="title"/>
+        <result property="type" column="type"/>
+        <result property="tableName" column="table_name"/>
+        <result property="pageName" column="page_name"/>
+        <result property="sort" column="sort"/>
+        <collection property="children" column="childrenId" ofType="com.myth.system.vo.SysMenuChildrenVo" javaType="list">
+            <id property="id" column="childrenId"/>
+            <result property="pid" column="childrenPid"/>
+            <result property="icon" column="childrenIcon"/>
+            <result property="title" column="childrenTitle"/>
+            <result property="type" column="childrenType"/>
+            <result property="tableName" column="childrenTableName"/>
+            <result property="pageName" column="childrenPageName"/>
+            <result property="sort" column="childrenSort"/>
+        </collection>
+    </resultMap>
+
+    <resultMap id="treeSysMenuVo" type="com.myth.system.vo.TreeSysMenuVo">
+        <id property="id" column="id"/>
+        <result property="label" column="title"/>
+        <result property="className" column="class_name"/>
+        <collection property="children" column="{pid=id}"
+                    select="com.myth.system.mapper.SysMenuMapper.getTreeSysMenuChildrenByPid"
+                    ofType="com.myth.system.vo.TreeSysMenuChildrenVo" javaType="list"/>
+    </resultMap>
+    <resultMap id="treeSysMenuChildrenVo" type="com.myth.system.vo.TreeSysMenuChildrenVo">
+        <id property="id" column="id"/>
+        <result property="label" column="title"/>
+        <result property="className" column="class_name"/>
+        <collection property="children" column="{menuId=id}"
+                    select="com.myth.system.mapper.SysPermissionMapper.getTreeSysPermissionByMenuId"
+                    ofType="com.myth.system.vo.TreeSysPermissionVo" javaType="list"/>
+    </resultMap>
+</mapper>

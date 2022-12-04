@@ -6,16 +6,16 @@
     <select id="getAllSysDictClass" resultType="com.myth.system.bean.SysDictClass">
         select * from sys_dict_class
     </select>
-    <insert id="insertSysDictClass" parameterType="com.myth.system.bean.SysDictClass">
+    <insert id="addSysDictClass" parameterType="com.myth.system.bean.SysDictClass">
         INSERT INTO sys_dict_class
             ( name)
         VALUES
             (#{name})
     </insert>
-    <update id="updateSysDictClass" parameterType="com.myth.system.bean.SysDictClass">
+    <update id="editSysDictClass" parameterType="com.myth.system.bean.SysDictClass">
         update sys_dict_class set name = #{name} where id = #{id}
     </update>
-    <delete id="deleteSysDictClass" parameterType="com.myth.system.bean.SysDictClass">
+    <delete id="deleteSysDictClassById" parameterType="com.myth.system.bean.SysDictClass">
         delete from sys_dict_class where id = #{id}
     </delete>
     <delete id="deleteSysDictByClassId" parameterType="com.myth.system.bean.SysDict">

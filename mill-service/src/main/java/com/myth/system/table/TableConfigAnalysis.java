@@ -47,6 +47,7 @@ public class TableConfigAnalysis{
             column.setIsQuery(columnJson.getBoolean("isQuery"));
             column.setIsAdd(columnJson.getBoolean("isAdd"));
             column.setIsEdit(columnJson.getBoolean("isEdit"));
+            column.setIsSee(columnJson.getBoolean("isSee"));
             column.setRegular(columnJson.getString("regular"));
             column.setTips(columnJson.getString("tips"));
             column.setIntegerMin(columnJson.getInteger("integerMin"));

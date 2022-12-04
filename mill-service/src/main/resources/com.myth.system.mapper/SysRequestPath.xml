@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.myth.system.mapper.SysRequestPathMapper">
+    <select id="getSysRequestPathByPermissionId" resultType="com.myth.system.bean.SysRequestPath">
+        select * from sys_request_path where permission_id = #{permissionId}
+    </select>
+    <select id="getSysRequestPathById" resultType="com.myth.system.bean.SysRequestPath">
+        select * from sys_request_path where id = #{id}
+    </select>
+
+    <insert id="addSysRequestPath" parameterType="com.myth.system.bean.SysRequestPath">
+        insert into sys_request_path
+            (permission_id,url,description)
+        values
+            (#{permissionId},#{url},#{description})
+    </insert>
+    <update id="editSysRequestPath" parameterType="com.myth.system.bean.SysRequestPath">
+        update sys_request_path set url=#{url},description=#{description} where id=#{id}
+    </update>
+    <delete id="deleteSysRequestPathById" parameterType="com.myth.system.bean.SysRequestPath">
+        delete from sys_request_path where id = #{id}
+    </delete>
+    <delete id="deleteSysRequestPathByPermissionId" parameterType="com.myth.system.bean.SysRequestPath">
+        delete from sys_request_path where permission_id = #{permissionId}
+    </delete>
+</mapper>

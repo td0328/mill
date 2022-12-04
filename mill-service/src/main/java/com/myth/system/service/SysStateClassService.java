@@ -1,5 +1,7 @@
 package com.myth.system.service;
 
+import com.myth.common.result.JsonResult;
+import com.myth.common.result.ResultTool;
 import com.myth.system.bean.SysState;
 import com.myth.system.bean.SysStateClass;
 import com.myth.system.bean.SysTableConfig;
@@ -23,19 +25,19 @@ public class SysStateClassService {
     private SysTableConfigMapper sysTableConfigMapper;
 
 
-    public JsonData getAllSysStateClass(){
+    public JsonResult getAllSysStateClass(){
         List<SysStateClass> list = sysStateClassMapper.getAllSysStateClass();
-        return JsonData.buildSuccess(list);
+        return ResultTool.success(list);
     }
-    public JsonData insertSysStateClass(SysStateClass sysStateClass){
-        sysStateClassMapper.insertSysStateClass(sysStateClass);
-        return JsonData.buildSuccess(sysStateClassMapper.getAllSysStateClass());
+    public JsonResult addSysStateClass(SysStateClass sysStateClass){
+        sysStateClassMapper.addSysStateClass(sysStateClass);
+        return ResultTool.success(sysStateClassMapper.getAllSysStateClass());
     }
-    public JsonData updateSysStateClass(SysStateClass sysStateClass){
-        sysStateClassMapper.updateSysStateClass(sysStateClass);
-        return JsonData.buildSuccess(sysStateClassMapper.getAllSysStateClass());
+    public JsonResult editSysStateClass(SysStateClass sysStateClass){
+        sysStateClassMapper.editSysStateClass(sysStateClass);
+        return ResultTool.success(sysStateClassMapper.getAllSysStateClass());
     }
-    public JsonData deleteStateClass(Integer[] ids){
+    public JsonResult deleteStateClassByIds(Integer[] ids){
         List<SysTableConfig> sysTableConfigList = sysTableConfigMapper.getAllSysTableConfig();
         int i = 0 ;
         for(Integer id:ids){
@@ -50,7 +52,7 @@ public class SysStateClassService {
                 }
             }
             if(is){
-                i = i+sysStateClassMapper.deleteSysStateClass(id);
+                i = i+sysStateClassMapper.deleteSysStateClassById(id);
                 sysStateClassMapper.deleteSysStateByClassId(id);
             }
         }
@@ -58,27 +60,27 @@ public class SysStateClassService {
         if(i<ids.length){
             msg = msg +"，其余在配置中有引用";
         }
-        return JsonData.buildSuccess(msg,sysStateClassMapper.getAllSysStateClass());
+        return ResultTool.success(msg,sysStateClassMapper.getAllSysStateClass());
     }
-    public JsonData getSysStateByClassId(Integer classId){
-        return JsonData.buildSuccess(sysStateClassMapper.getAllSysStateByClassId(classId));
+    public JsonResult getSysStateByClassId(Integer classId){
+        return ResultTool.success(sysStateClassMapper.getAllSysStateByClassId(classId));
     }
-    public JsonData insertSysState(SysState sysState){
+    public JsonResult addSysState(SysState sysState){
         List<SysState> sysStateList = sysStateClassMapper.getSysStateByClassIdAndValue(sysState.getClassId(),sysState.getValue());
         if(sysStateList.size()>0){
-            return JsonData.buildFail("该值已存在");
+            return ResultTool.fail();
         }else{
-            sysStateClassMapper.insertSysState(sysState);
-            return JsonData.buildSuccess(sysStateClassMapper.getAllSysStateByClassId(sysState.getClassId()));
+            sysStateClassMapper.addSysState(sysState);
+            return ResultTool.success(sysStateClassMapper.getAllSysStateByClassId(sysState.getClassId()));
         }
     }
-    public JsonData updateSysState(SysState sysState){
-        sysStateClassMapper.updateSysState(sysState);
-        return JsonData.buildSuccess(sysStateClassMapper.getAllSysStateByClassId(sysState.getClassId()));
+    public JsonResult editSysState(SysState sysState){
+        sysStateClassMapper.editSysState(sysState);
+        return ResultTool.success(sysStateClassMapper.getAllSysStateByClassId(sysState.getClassId()));
     }
-    public JsonData deleteSysState(Integer[] ids,Integer classId){
-        Integer i = sysStateClassMapper.deleteSysState(ids);
+    public JsonResult deleteSysStateByIds(Integer[] ids,Integer classId){
+        Integer i = sysStateClassMapper.deleteSysStateByIds(ids);
         String msg = "成功删除"+i+"条数据";
-        return JsonData.buildSuccess(sysStateClassMapper.getAllSysStateByClassId(classId));
+        return ResultTool.success(sysStateClassMapper.getAllSysStateByClassId(classId));
     }
 }

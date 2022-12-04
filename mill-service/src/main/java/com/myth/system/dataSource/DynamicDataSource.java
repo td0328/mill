@@ -72,6 +72,17 @@ public class DynamicDataSource extends AbstractRoutingDataSource {
     //创建一个新的数据源连接，并且设置此数据源为我们要用的数据源
     public boolean createDataSource(DataSourceVo dataSourceVo) throws NoSuchFieldException, IllegalAccessException {
         // 获取配置在Yaml文件中的所有数据源信息
+        /*
+        if(dataSourceVo.getDataName()==null){
+            dataSourceVo.setKey("mysql");
+            dataSourceVo.setDataType("mysql");
+            dataSourceVo.setUrl("127.0.0.1");
+            dataSourceVo.setPort("3306");
+            dataSourceVo.setDataName("jraz");
+            dataSourceVo.setUsername("root");
+            dataSourceVo.setPassword("qsxs00Fq");
+        }
+         */
         Map<String, Object> dataBaseConfig = dataSourceConfig.getDataBaseConfig();
         // 根据数据库类型获取数据源信息
         Map<String, String> dataConfig = (Map<String, String>) dataBaseConfig.get(dataSourceVo.getDataType());

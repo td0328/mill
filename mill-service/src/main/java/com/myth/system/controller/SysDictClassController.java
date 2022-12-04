@@ -1,5 +1,8 @@
 package com.myth.system.controller;
 
+import com.myth.common.result.JsonResult;
+import com.myth.common.result.ResultCode;
+import com.myth.common.result.ResultTool;
 import com.myth.system.bean.SysDictClass;
 import com.myth.system.dataSource.DataSourceVo;
 import com.myth.system.dataSource.DynamicDataSource;
@@ -18,8 +21,8 @@ public class SysDictClassController {
     private DynamicDataSource dynamicDataSource;
     @Autowired
     private SysDictClassService sysDictClassService;
-    @GetMapping("/sysDictClass")
-    public JsonData getAllSysDictClass(DataSourceVo dataSourceVo){
+    @PostMapping("/getAllSysDictClass")
+    public JsonResult getAllSysDictClass(DataSourceVo dataSourceVo){
         try {
             //切换数据源之前先清空
             DynamicDataSource.clearDataSource();
@@ -28,19 +31,20 @@ public class SysDictClassController {
             return sysDictClassService.getAllSysDictClass();
         } catch (NoSuchFieldException | IllegalAccessException e) {
             //throw new RuntimeException(e);
-            return JsonData.buildFail();
+            return ResultTool.fail(ResultCode.COMMON_FAIL);
         }
     }
-    @PostMapping("/sysDictClass")
-    public JsonData saveSysDictClass(SysDictClass sysDictClass){
-        if(sysDictClass.getId()==null)
-            return sysDictClassService.insertSysDictClass(sysDictClass);
-        else
-            return sysDictClassService.updateSysDictClass(sysDictClass);
+    @PostMapping("/addSysDictClass")
+    public JsonResult addSysDictClass(SysDictClass sysDictClass){
+        return sysDictClassService.addSysDictClass(sysDictClass);
     }
-    @DeleteMapping("/sysDictClass")
-    public JsonData deleteSysDictClass(@RequestParam Integer[] ids)
+    @PostMapping("/editSysDictClass")
+    public JsonResult editSysDictClass(SysDictClass sysDictClass){
+        return sysDictClassService.editSysDictClass(sysDictClass);
+    }
+    @PostMapping("/deleteSysDictClassByIds")
+    public JsonResult deleteSysDictClassByIds(@RequestParam Integer[] ids)
     {
-        return sysDictClassService.deleteSysDictClass(ids);
+        return sysDictClassService.deleteSysDictClassByIds(ids);
     }
 }

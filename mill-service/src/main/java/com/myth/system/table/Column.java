@@ -18,7 +18,9 @@ public class Column {
     private Boolean isShow;                //是否在列表页显示
     private Boolean isQuery;               //是否作为查询条件
     private Boolean isAdd;                 //是否在新增页显示
-    private Boolean isEdit;                //是否在查询页显示
+    private Boolean isEdit;                //是否在编辑页显示
+    private Boolean isSee;               //是否在查看页显示
+
     //字符串类型
     private String regular;                //正则表达式（验证内容用）
     private String tips;                   //验证提示内容

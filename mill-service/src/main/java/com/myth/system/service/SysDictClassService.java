@@ -1,5 +1,8 @@
 package com.myth.system.service;
 
+import com.myth.common.result.JsonResult;
+import com.myth.common.result.ResultCode;
+import com.myth.common.result.ResultTool;
 import com.myth.system.bean.SysDictClass;
 import com.myth.system.bean.SysTableConfig;
 import com.myth.system.enums.PageDataType;
@@ -21,19 +24,19 @@ public class SysDictClassService {
     private SysDictClassMapper sysDictClassMapper;
     @Autowired
     private SysTableConfigMapper sysTableConfigMapper;
-    public JsonData getAllSysDictClass(){
+    public JsonResult getAllSysDictClass(){
         List<SysDictClass> list = sysDictClassMapper.getAllSysDictClass();
-        return JsonData.buildSuccess(list);
+        return ResultTool.success(list);
     }
-    public JsonData insertSysDictClass(SysDictClass sysDictClass){
-        sysDictClassMapper.insertSysDictClass(sysDictClass);
-        return JsonData.buildSuccess(sysDictClassMapper.getAllSysDictClass());
+    public JsonResult addSysDictClass(SysDictClass sysDictClass){
+        sysDictClassMapper.addSysDictClass(sysDictClass);
+        return ResultTool.success(sysDictClassMapper.getAllSysDictClass());
     }
-    public JsonData updateSysDictClass(SysDictClass sysDictClass){
-        sysDictClassMapper.updateSysDictClass(sysDictClass);
-        return JsonData.buildSuccess(sysDictClassMapper.getAllSysDictClass());
+    public JsonResult editSysDictClass(SysDictClass sysDictClass){
+        sysDictClassMapper.editSysDictClass(sysDictClass);
+        return ResultTool.success(sysDictClassMapper.getAllSysDictClass());
     }
-    public JsonData deleteSysDictClass(Integer[] ids){
+    public JsonResult deleteSysDictClassByIds(Integer[] ids){
         List<SysTableConfig> sysTableConfigList = sysTableConfigMapper.getAllSysTableConfig();
         int i = 0 ;
         for(Integer id:ids){
@@ -53,7 +56,7 @@ public class SysDictClassService {
                 }
             }
             if(is){
-                i = i+sysDictClassMapper.deleteSysDictClass(id);
+                i = i+sysDictClassMapper.deleteSysDictClassById(id);
                 sysDictClassMapper.deleteSysDictByClassId(id);
             }
         }
@@ -61,6 +64,6 @@ public class SysDictClassService {
         if(i<ids.length){
             msg = msg +"，其余在配置中有引用";
         }
-        return JsonData.buildSuccess(msg,sysDictClassMapper.getAllSysDictClass());
+        return ResultTool.success(msg,sysDictClassMapper.getAllSysDictClass());
     }
 }

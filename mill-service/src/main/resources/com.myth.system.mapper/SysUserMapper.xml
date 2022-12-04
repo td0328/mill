@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.myth.system.mapper.SysUserMapper">
+    <select id="selectOne" resultType="com.myth.system.bean.SysUser">
+        select * from sys_user where account = #{account}
+    </select>
+    <update id="update" parameterType="com.myth.system.bean.SysUser">
+        update sys_user set
+            last_login_time = #{sysUser.lastLoginTime},
+            update_time = #{sysUser.UpdateTime},
+            update_user = #{sysUser.UpdateUser}
+        ${ew.customSqlSegment}
+    </update>
+    <select id="getSysUserById" resultType="com.myth.system.bean.SysUser">
+        select * from sys_user where id = #{id}
+    </select>
+    <select id="getSysUserByQueryWrapper" resultType="com.myth.system.bean.SysUser">
+        select * from sys_user ${ew.customSqlSegment}
+    </select>
+    <insert id="addSysUser" parameterType="com.myth.system.bean.SysUser"
+            useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        insert into sys_user
+            (account,user_name,password,enabled,create_time,create_user)
+        values
+            (#{account},#{userName},#{password},#{enabled},#{createTime},#{createUser})
+    </insert>
+    <select id="getSysUserByIdAndAccount" resultType="com.myth.system.bean.SysUser">
+        select * from sys_user where id &lt;> #{id} and account = #{account}
+    </select>
+    <update id="editSysUser" parameterType="com.myth.system.bean.SysUser">
+        update sys_user set account = #{account},user_name = #{userName},update_time = #{updateTime},update_user = #{updateUser} where id = #{id}
+    </update>
+    <delete id="deleteSysUserByIds" parameterType="com.myth.system.bean.SysUser">
+        delete from sys_user where id in
+        <foreach collection="ids" item="id"  separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+    <update id="resetPassword" parameterType="com.myth.system.bean.SysUser">
+        update sys_user set password = #{password} where id = #{id}
+    </update>
+</mapper>

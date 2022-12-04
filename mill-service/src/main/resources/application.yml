@@ -1,17 +1,19 @@
 server:
   port: 8081
-mybatis:
+  max-http-header-size: 102400
+mybatis-plus:
   config-location: classpath:mybatis-config.xml
   mapper-locations: classpath:com.myth.system.mysql.mapper/*.xml,classpath:com.myth.system.mapper/*.xml
+  type-handlers-package: com.myth.handler
 
 spring:
   aop:
     proxy-target-class: true  #true为使用CGLIB代理,AOP动态代理
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://129.28.171.108:3306/mill
-    username: mill
-    password: jXWYhHxhBih8cFTB
+    url: jdbc:mysql://localhost:3306/jraz?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: qsxs00Fq
     dataType: mysql  # 可选值 mysql oracle sqlserver postgresql
     type: com.alibaba.druid.pool.DruidDataSource
     druid:
@@ -24,7 +26,7 @@ spring:
 datatype:
   mysql:
     driverClassName: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://{IP}:{port}/{database}
+    url: jdbc:mysql://{IP}:{port}/{database}?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
   clickhouse:
     driverClassName: ru.yandex.clickhouse.ClickHouseDriver
     url: jdbc:clickhouse://{IP}:{port}/{database}

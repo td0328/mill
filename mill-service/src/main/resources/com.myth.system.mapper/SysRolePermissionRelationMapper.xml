@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.myth.system.mapper.SysRolePermissionRelationMapper">
+    <insert id="addSysRolePermissionRelation" parameterType="com.myth.system.bean.SysRolePermissionRelation">
+        INSERT INTO sys_role_permission_relation
+            (role_id,permission_id)
+        VALUES
+            (#{roleId},#{permissionId})
+    </insert>
+    <delete id="deleteSysRolePermissionRelation" parameterType="com.myth.system.bean.SysRolePermissionRelation">
+        delete from sys_role_permission_relation where role_id in
+        <foreach collection="roleIds" item="id"  separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+    <select id="getSysRolePermissionRelationByRoleId" resultType="com.myth.system.bean.SysRolePermissionRelation">
+        select * from sys_role_permission_relation where role_id = #{roleId}
+    </select>
+
+    <select id="getSysRolePermissionRelationByRoleIdAndPermissionId" resultType="com.myth.system.bean.SysRolePermissionRelation">
+        select * from sys_role_permission_relation where role_id = #{roleId} and permission_id = #{permissionId}
+    </select>
+    <delete id="deleteSysRolePermissionRelationById" parameterType="com.myth.system.bean.SysRolePermissionRelation">
+        delete from sys_role_permission_relation where id = #{id}
+    </delete>
+</mapper>

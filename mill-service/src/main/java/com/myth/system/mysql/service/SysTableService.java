@@ -1,6 +1,8 @@
 package com.myth.system.mysql.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.myth.common.result.JsonResult;
+import com.myth.common.result.ResultTool;
 import com.myth.system.bean.SysDictClass;
 import com.myth.system.bean.SysStateClass;
 import com.myth.system.bean.SysTableConfig;
@@ -8,7 +10,7 @@ import com.myth.system.mysql.bean.SysKeyColumnUsage;
 import com.myth.system.mysql.bean.SysTable;
 import com.myth.system.mysql.bean.SysTableColumn;
 import com.myth.system.table.*;
-import com.myth.system.mysql.mapper.TableMapper;
+import com.myth.system.mysql.mapper.SysTableMapper;
 import com.myth.utils.JsonData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,15 +21,15 @@ import java.util.HashMap;
 import java.util.List;
 
 @Service
-public class TableService {
+public class SysTableService {
     @Autowired
-    private TableMapper tableMapper;
+    private SysTableMapper tableMapper;
 
-    public List<SysTable> getAllTable(String tableSchema) {
-        return tableMapper.getAllTable(tableSchema);
+    public JsonResult getAllSysTableConfigByTableSchema(String tableSchema) {
+        return ResultTool.success(tableMapper.getAllSysTableConfigByTableSchema(tableSchema));
     }
 
-    public JsonData insertSysTableConfig(String tableSchema, String tableName, String title) {
+    public JsonResult addSysTableConfig(String tableSchema, String tableName, String title) {
         //初始化表配置
         Table table = new Table();
         table.setTableSchema(tableSchema);
@@ -35,35 +37,23 @@ public class TableService {
         table.setTitle(title);
         table.setSort(new HashMap<>());
         table.setColumns(new ArrayList<>());
-        Integer i = tableMapper.insertSysTableConfig(tableName, JSONObject.toJSONString(table));
-        List<SysTable> listSysTable = tableMapper.getAllTable(tableSchema);
-        if (i > 0)
-            return JsonData.buildSuccess("配置成功", listSysTable);
-        else
-            return JsonData.buildFail("配置失败", listSysTable);
+        Integer i = tableMapper.addSysTableConfig(tableName, JSONObject.toJSONString(table));
+        return ResultTool.success(tableMapper.getAllSysTableConfigByTableSchema(tableSchema));
     }
 
-    public JsonData updateSysTableConfigTitle(String tableName, String title) {
+    public JsonResult editSysTableConfigTitle(String tableName, String title) {
         Table table = getTableByName(tableName);
         table.setTitle(title);
-        Integer i = tableMapper.updateSysTableConfig(JSONObject.toJSONString(table), tableName);
-        List<SysTable> listSysTable = tableMapper.getAllTable(table.getTableSchema());
-        if (i > 0)
-            return JsonData.buildSuccess("配置成功", tableMapper.getAllTable(table.getTableSchema()));
-        else
-            return JsonData.buildFail("配置失败", listSysTable);
+        Integer i = tableMapper.editSysTableConfig(JSONObject.toJSONString(table), tableName);
+        return ResultTool.success(tableMapper.getAllSysTableConfigByTableSchema(table.getTableSchema()));
     }
 
-    public JsonData deleteSysTableConfig(String[] ids, String tableSchema) {
-        Integer i = tableMapper.deleteSysTableConfig(ids);
-        List<SysTable> listSysTable = tableMapper.getAllTable(tableSchema);
-        if (i > 0)
-            return JsonData.buildSuccess("成功删除" + i + "条数据", listSysTable);
-        else
-            return JsonData.buildFail("没有匹配的数据可删除", listSysTable);
+    public JsonResult deleteSysTableConfigByIds(String[] ids, String tableSchema) {
+        tableMapper.deleteSysTableConfigByIds(ids);
+        return ResultTool.success(tableMapper.getAllSysTableConfigByTableSchema(tableSchema));
     }
 
-    public JsonData getTableColumnConfigByTable(String tableName) {
+    public JsonResult getTableColumnConfigByTableName(String tableName) {
         Table table = getTableByName(tableName);
         List<Column> oidColumnAllConfig = table.getColumns();
         List<Column> newColumnAllConfig = new ArrayList<>();
@@ -87,8 +77,8 @@ public class TableService {
         }
         table.setColumns(newColumnAllConfig);
         String tableJsonStr = JSONObject.toJSONString(table);
-        tableMapper.updateSysTableConfig(tableJsonStr, tableName);
-        return JsonData.buildSuccess(table);
+        tableMapper.editSysTableConfig(tableJsonStr, tableName);
+        return ResultTool.success(table);
     }
 
     public SysTableConfig getSysTableConfigByName(String tableName) {
@@ -99,7 +89,7 @@ public class TableService {
         return tableMapper.getTableColumnByTable(tableSchema, tableName);
     }
 
-    public JsonData updateSysTableConfigSort(String tableName, String column, String type, String sort) {
+    public JsonResult editSysTableConfigSort(String tableName, String column, String type, String sort) {
         Table table = getTableByName(tableName);
         HashMap<String,String> sortMap = table.getSort();
         if (type.equals("add")) {
@@ -109,11 +99,11 @@ public class TableService {
             sortMap.remove(column);
         }
         table.setSort(sortMap);
-        tableMapper.updateSysTableConfig(JSONObject.toJSONString(table), tableName);
-        return JsonData.buildSuccess(table);
+        tableMapper.editSysTableConfig(JSONObject.toJSONString(table), tableName);
+        return ResultTool.success(table);
     }
 
-    public JsonData getColumnTypeData(String tableName, String columnName) {
+    public JsonResult getColumnTypeData(String tableName, String columnName) {
         Table table = getTableByName(tableName);
         HashMap<String,Object> map = new HashMap<>();
         List<HashMap<String,String>> columnTypeList = TableConfigAnalysis.getPageDataType(table,columnName);
@@ -130,9 +120,9 @@ public class TableService {
             columnList = pTable.getColumns();
         }
         map.put("pColumnList",columnList);
-        return JsonData.buildSuccess(map);
+        return ResultTool.success(map);
     }
-    public JsonData saveColumnConfig (Column column){
+    public JsonResult editColumnConfig (Column column){
         SysTableConfig sysTableConfig = tableMapper.getSysTableConfigByName(column.getTableName());
         Table table = TableConfigAnalysis.JsonToTable(sysTableConfig.getContent());
         SysTableColumn sysTableColumn = tableMapper.getTableColumnByName(table.getTableSchema(),table.getTableName(),column.getColumnName());
@@ -161,8 +151,8 @@ public class TableService {
         }
         table.setColumns(columnList);
         String tableJson = JSONObject.toJSONString(table);
-        tableMapper.updateSysTableConfig(tableJson,table.getTableName());
-        return JsonData.buildSuccess(newColumn);
+        tableMapper.editSysTableConfig(tableJson,table.getTableName());
+        return ResultTool.success(newColumn);
     }
     //获取table配置
     public Table getTableByName(String tableName){

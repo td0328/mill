@@ -2,25 +2,25 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.myth.system.mysql.mapper.TableMapper">
-    <select id="getAllTable" resultType="com.myth.system.mysql.bean.SysTable">
+<mapper namespace="com.myth.system.mysql.mapper.SysTableMapper">
+    <select id="getAllSysTableConfigByTableSchema" resultType="com.myth.system.mysql.bean.SysTable">
         select * from
             information_schema.TABLES LEFT JOIN sys_table_config on information_schema.TABLES.table_name = sys_table_config.table_name
-        WHERE information_schema.TABLES.TABLE_SCHEMA = #{tableSchema} and (information_schema.TABLES.TABLE_NAME not like 'sys_%' or information_schema.TABLES.TABLE_NAME = 'sys_user') ORDER BY information_schema.TABLES.TABLE_NAME
+        WHERE information_schema.TABLES.TABLE_SCHEMA = #{tableSchema} and information_schema.TABLES.TABLE_NAME not like 'sys_%' ORDER BY information_schema.TABLES.TABLE_NAME
     </select>
     <select id="getSysTableConfigByName" resultType="com.myth.system.bean.SysTableConfig">
         select * from sys_table_config where table_name = #{tableName}
     </select>
-    <insert id="insertSysTableConfig" parameterType="com.myth.system.bean.SysTableConfig">
+    <insert id="addSysTableConfig" parameterType="com.myth.system.bean.SysTableConfig">
         INSERT INTO sys_table_config
             ( table_name, content)
         VALUES
             (#{tableName},#{content})
     </insert>
-    <update id="updateSysTableConfig" parameterType="com.myth.system.bean.SysTableConfig">
+    <update id="editSysTableConfig" parameterType="com.myth.system.bean.SysTableConfig">
         update sys_table_config set content=#{content} where table_name = #{tableName}
     </update>
-    <delete id="deleteSysTableConfig" parameterType="com.myth.system.bean.SysTableConfig">
+    <delete id="deleteSysTableConfigByIds" parameterType="com.myth.system.bean.SysTableConfig">
         delete from sys_table_config where table_name in
         <foreach collection="ids" item="id"  separator="," open="(" close=")">
             #{id}

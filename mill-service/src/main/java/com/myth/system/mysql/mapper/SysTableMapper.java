@@ -11,11 +11,11 @@ import org.apache.ibatis.annotations.Mapper;
 import java.util.List;
 
 @Mapper
-public interface TableMapper {
-    public List<SysTable> getAllTable(String tableSchema);
-    public Integer insertSysTableConfig(String tableName,String content);
-    public Integer updateSysTableConfig(String content, String tableName);
-    public Integer deleteSysTableConfig(String[] ids);
+public interface SysTableMapper {
+    public List<SysTable> getAllSysTableConfigByTableSchema(String tableSchema);
+    public Integer addSysTableConfig(String tableName,String content);
+    public Integer editSysTableConfig(String content, String tableName);
+    public Integer deleteSysTableConfigByIds(String[] ids);
     public List<SysTableColumn> getTableColumnByTable(String tableSchema, String tableName);
     public SysTableConfig getSysTableConfigByName(String tableName);
     public SysKeyColumnUsage getKeyColumnUsageByColumn(String tableSchema, String tableName, String columnName);

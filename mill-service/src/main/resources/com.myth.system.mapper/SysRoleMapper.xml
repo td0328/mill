@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.myth.system.mapper.SysRoleMapper">
+    <select id="getSysRoleById" resultType="com.myth.system.bean.SysRole">
+        select * from sys_role where id = #{id}
+    </select>
+    <select id="getAllSysRole" resultType="com.myth.system.bean.SysRole">
+        select * from sys_role
+    </select>
+
+    <select id="getSysRoleByQueryWrapper" resultType="com.myth.system.bean.SysRole">
+        select * from sys_role ${ew.customSqlSegment}
+    </select>
+    <insert id="addSysRole" parameterType="com.myth.system.bean.SysRole"
+            useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        insert into sys_role(role_name,role_description) values (#{roleName},#{roleDescription})
+    </insert>
+    <delete id="deleteSysRole" parameterType="com.myth.system.bean.SysRole">
+        delete from sys_role where id in
+        <foreach collection="ids" item="id"  separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+    <update id="editSysRole" parameterType="com.myth.system.bean.SysRole">
+        update sys_role set role_name = #{roleName},role_description = #{roleDescription} where id = #{id}
+    </update>
+</mapper>
