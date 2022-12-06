@@ -5,6 +5,7 @@ import com.alibaba.druid.util.StringUtils;
 import com.myth.utils.SpringContextUtils;
 import org.apache.ibatis.mapping.Environment;
 import org.apache.ibatis.session.SqlSessionFactory;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -15,13 +16,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @Author: Mr.Lee
- * @Date: 2022/8/13 11:11
- * @param
- * @Description:
- * 切换数据源的核心配置类
- */
+
 
 //涉及到数据源一定要加事务管理注解
 @EnableTransactionManagement
@@ -70,72 +65,79 @@ public class DynamicDataSource extends AbstractRoutingDataSource {
         contextHolder.remove();
     }
     //创建一个新的数据源连接，并且设置此数据源为我们要用的数据源
-    public boolean createDataSource(DataSourceVo dataSourceVo) throws NoSuchFieldException, IllegalAccessException {
-        // 获取配置在Yaml文件中的所有数据源信息
-        /*
-        if(dataSourceVo.getDataName()==null){
-            dataSourceVo.setKey("mysql");
-            dataSourceVo.setDataType("mysql");
-            dataSourceVo.setUrl("127.0.0.1");
-            dataSourceVo.setPort("3306");
-            dataSourceVo.setDataName("jraz");
-            dataSourceVo.setUsername("root");
-            dataSourceVo.setPassword("qsxs00Fq");
-        }
-         */
-        Map<String, Object> dataBaseConfig = dataSourceConfig.getDataBaseConfig();
-        // 根据数据库类型获取数据源信息
-        Map<String, String> dataConfig = (Map<String, String>) dataBaseConfig.get(dataSourceVo.getDataType());
-        if(dataConfig == null) {
-            // 不支持此类数据源
-            throw new RuntimeException("不支持此数据源！");
-        }
-        String driveName = dataConfig.get("driverClassName");
-        // url  替换其中的占位符
-        String url = dataConfig.get("url").replaceAll("\\{IP}", dataSourceVo.getUrl())
-                .replaceAll("\\{port}", dataSourceVo.getPort())
-                .replaceAll("\\{database}",dataSourceVo.getDataName());
-        // 测试连接
-        testConnection(driveName, url, dataSourceVo.getUsername(), dataSourceVo.getPassword());
-
-        // 通过Druid数据库连接池连接数据库
-        DruidDataSource dataSource = new DruidDataSource();
-        //接收前端传递的参数并且注入进去
-        dataSource.setName(dataSourceVo.getDataName());
-        dataSource.setUrl(url);
-        dataSource.setUsername(dataSourceVo.getUsername());
-        dataSource.setPassword(dataSourceVo.getPassword());
-        dataSource.setDriverClassName(driveName);
-        // 设置最大连接等待时间
-        dataSource.setMaxWait(4000);
-
-        // 数据源初始化
+    public boolean createDataSource(DataSourceVo dataSourceVo) {
         try {
-            dataSource.init();
-        } catch (SQLException e) {
-            // 创建失败则抛出异常
-            throw new RuntimeException();
+            clearDataSource();
+            String driveName = null;
+            String url = null;
+            if(dataSourceVo!=null){
+                // 获取配置在Yaml文件中的所有数据源信息
+                Map<String, Object> dataBaseConfig = dataSourceConfig.getDataBaseConfig();
+                // 根据数据库类型获取数据源信息
+                Map<String, String> dataConfig = (Map<String, String>) dataBaseConfig.get(dataSourceVo.getDataType());
+                if(dataConfig == null) {
+                    // 不支持此类数据源
+                    throw new RuntimeException("不支持此数据源！");
+                }
+                driveName = dataConfig.get("driverClassName");
+                // url  替换其中的占位符
+                url = dataConfig.get("url").replaceAll("\\{IP}", dataSourceVo.getUrl())
+                        .replaceAll("\\{port}", dataSourceVo.getPort())
+                        .replaceAll("\\{database}",dataSourceVo.getDataName());
+                // 测试连接
+            }else{
+                Map<String, Object> dataBaseConfig = dataSourceConfig.getDefaultDataBase();
+                driveName = dataBaseConfig.get("driverClassName").toString();
+                url = dataBaseConfig.get("url").toString();
+                dataSourceVo = new DataSourceVo();
+                dataSourceVo.setKey("default");
+                dataSourceVo.setDataName(dataBaseConfig.get("name").toString());
+                dataSourceVo.setUsername(dataBaseConfig.get("username").toString());
+                dataSourceVo.setPassword(dataBaseConfig.get("password").toString());
+            }
+            testConnection(driveName, url, dataSourceVo.getUsername(), dataSourceVo.getPassword());
+
+            // 通过Druid数据库连接池连接数据库
+            DruidDataSource dataSource = new DruidDataSource();
+            //接收前端传递的参数并且注入进去
+            dataSource.setName(dataSourceVo.getDataName());
+            dataSource.setUrl(url);
+            dataSource.setUsername(dataSourceVo.getUsername());
+            dataSource.setPassword(dataSourceVo.getPassword());
+            dataSource.setDriverClassName(driveName);
+            // 设置最大连接等待时间
+            dataSource.setMaxWait(4000);
+
+            // 数据源初始化
+            try {
+                dataSource.init();
+            } catch (SQLException e) {
+                // 创建失败则抛出异常
+                throw new RuntimeException();
+            }
+            //获取当前数据源的键值对存入Map
+            this.dynamicTargetDataSources.put(dataSourceVo.getKey(), dataSource);
+            // 设置数据源
+            this.setTargetDataSources(this.dynamicTargetDataSources);
+            // 解析数据源
+            super.afterPropertiesSet();
+            // 切换数据源
+            setDataSource(dataSourceVo.getKey());
+            /**
+             ** 修改mybatis的数据源
+             * ！！！重要，不修改mybatis的数据源的话，
+             * 即使切换了数据源之后还是会出现默认数据源的情况
+             */
+            SqlSessionFactory SqlSessionFactory = (SqlSessionFactory) SpringContextUtils.getBean(SqlSessionFactory.class);
+            Environment environment =SqlSessionFactory.getConfiguration().getEnvironment();
+            Field dataSourceField = environment.getClass().getDeclaredField("dataSource");
+            //跳过检验
+            dataSourceField.setAccessible(true);
+            //修改mybatis的数据源
+            dataSourceField.set(environment,dataSource);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new RuntimeException(e);
         }
-        //获取当前数据源的键值对存入Map
-        this.dynamicTargetDataSources.put(dataSourceVo.getKey(), dataSource);
-        // 设置数据源
-        this.setTargetDataSources(this.dynamicTargetDataSources);
-        // 解析数据源
-        super.afterPropertiesSet();
-        // 切换数据源
-        setDataSource(dataSourceVo.getKey());
-        /**
-         ** 修改mybatis的数据源
-         * ！！！重要，不修改mybatis的数据源的话，
-         * 即使切换了数据源之后还是会出现默认数据源的情况
-         */
-        SqlSessionFactory SqlSessionFactory = (SqlSessionFactory) SpringContextUtils.getBean(SqlSessionFactory.class);
-        Environment environment =SqlSessionFactory.getConfiguration().getEnvironment();
-        Field dataSourceField = environment.getClass().getDeclaredField("dataSource");
-        //跳过检验
-        dataSourceField.setAccessible(true);
-        //修改mybatis的数据源
-        dataSourceField.set(environment,dataSource);
         //修改完成后所有线程使用此数据源
         return true;
     }

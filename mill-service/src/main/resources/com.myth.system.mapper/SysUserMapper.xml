@@ -41,4 +41,7 @@
     <update id="resetPassword" parameterType="com.myth.system.bean.SysUser">
         update sys_user set password = #{password} where id = #{id}
     </update>
+    <update id="setEnabled" parameterType="com.myth.system.bean.SysUser">
+        update sys_user set enabled = #{enabled} where id = #{id}
+    </update>
 </mapper>

@@ -2,6 +2,7 @@ package com.myth.system.service.imple;
 
 import com.myth.system.bean.SysPermission;
 import com.myth.system.bean.SysUser;
+import com.myth.system.dataSource.DynamicDataSource;
 import com.myth.system.mapper.SysPermissionMapper;
 import com.myth.system.mapper.SysUserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,20 +25,22 @@ public class SecurityUserServiceImpl implements SecurityUserService {
 
     @Autowired
     private SysPermissionMapper sysPermissionMapper;
+    @Autowired
+    private DynamicDataSource dynamicDataSource;
 
     /**
      * 根据用户名查找数据库，判断是否存在这个用户
      * */
     @Override
     public UserDetails loadUserByUsername(String account) throws UsernameNotFoundException {
-
+        //切换至默认数据库
+        dynamicDataSource.createDataSource(null);
         // 用户名必须是唯一的，不允许重复
         SysUser sysUser = sysUserMapper.selectOne(account);
 
         if(StringUtils.isEmpty(sysUser)){
             throw new UsernameNotFoundException("根据用户名找不到该用户的信息！");
         }
-
         List<SysPermission> sysPermissions = sysPermissionMapper.getUserRolesByUserId(sysUser.getId());
         List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
         sysPermissions.stream().forEach(sysPermission -> {

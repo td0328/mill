@@ -23,6 +23,8 @@ import java.util.Map;
 //事务管理，数据库连接这里涉及到事务的提交
 @EnableTransactionManagement
 public class DataSourceConfig {
+    @Value("${spring.datasource.name}")
+    private String name;
     // 动态注入数据库信息
     @Value("${spring.datasource.url}")
     private String url;
@@ -58,6 +60,20 @@ public class DataSourceConfig {
 
     // 获取数据源的驱动信息
     public Map<String, Object> getDataBaseConfig() {
+        Map<String, Object> map = getYaml();
+        //这里通过Map的方式获取到yaml文件里面的dataType是哪一个
+        Map<String, Object> dataBaseConfig = (Map<String, Object>) map.get("datatype");
+        return dataBaseConfig;
+    }
+    public Map<String, Object> getDefaultDataBase() {
+        Map<String, Object> map = getYaml();
+        //这里通过Map的方式获取到yaml文件里面的dataType是哪一个
+        Map<String, Object> dataBaseConfig = (Map<String, Object>)((Map<String, Object>) map.get("spring")).get("datasource");
+        return dataBaseConfig;
+    }
+    //获取Yaml
+    public Map<String, Object> getYaml() {
+        //获取Yaml
         Yaml yaml = new Yaml();
         Map<String, Object> map;
         try {
@@ -65,8 +81,6 @@ public class DataSourceConfig {
         } catch (IOException e) {
             throw new RuntimeException("SYS_PATH_ERROR");
         }
-        //这里通过Map的方式获取到yaml文件里面的dataType是哪一个
-        Map<String, Object> dataBaseConfig = (Map<String, Object>) map.get("datatype");
-        return dataBaseConfig;
+        return map;
     }
 }

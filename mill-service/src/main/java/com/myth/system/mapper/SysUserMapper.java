@@ -22,4 +22,5 @@ public interface SysUserMapper {
     Integer editSysUser(SysUser SysUser);
     Integer deleteSysUserByIds(Integer[] ids);
     Integer resetPassword(SysUser SysUser);
+    Integer setEnabled(SysUser SysUser);
 }

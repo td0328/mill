@@ -5,6 +5,7 @@ import com.myth.common.result.JsonResult;
 import com.myth.common.result.ResultCode;
 import com.myth.common.result.ResultTool;
 import com.myth.common.utils.JwtUtils;
+import com.myth.system.dataSource.DynamicDataSource;
 import com.myth.system.service.imple.SecurityUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -33,6 +34,8 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
      * */
     @Autowired
     private SecurityUserService userDetailsService;
+    @Autowired
+    private DynamicDataSource dynamicDataSource;
 
     @Override
     protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {
@@ -53,6 +56,7 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
         if (!account.equals("") && SecurityContextHolder.getContext().getAuthentication() == null) {
             // token中username不为空，并且Context中的认证为空，进行token验证
             // 获取到用户的信息，也就是获取到用户的权限
+
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(account);
             if (JwtUtils.checkToken(authToken)) {   // 验证当前token是否有效
                 UsernamePasswordAuthenticationToken authentication =
@@ -63,17 +67,6 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
             }
 
         }
-
-        /*
-        else{
-            JsonResult noPermission = ResultTool.fail(ResultCode.USER_ACCOUNT_EXPIRE);
-            //处理编码方式，防止中文乱码的情况
-            httpServletResponse.setContentType("text/json;charset=utf-8");
-            // 把Json数据放到HttpServletResponse中返回给前台
-            httpServletResponse.getWriter().write(JSON.toJSONString(noPermission));
-        }
-
-         */
         // 放行给下个过滤器
         filterChain.doFilter(httpServletRequest, httpServletResponse);
     }

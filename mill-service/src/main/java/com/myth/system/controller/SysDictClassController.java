@@ -7,10 +7,11 @@ import com.myth.system.bean.SysDictClass;
 import com.myth.system.dataSource.DataSourceVo;
 import com.myth.system.dataSource.DynamicDataSource;
 import com.myth.system.service.SysDictClassService;
-import com.myth.utils.JsonData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpSession;
 
 
 @Controller
@@ -23,28 +24,22 @@ public class SysDictClassController {
     private SysDictClassService sysDictClassService;
     @PostMapping("/getAllSysDictClass")
     public JsonResult getAllSysDictClass(DataSourceVo dataSourceVo){
-        try {
-            //切换数据源之前先清空
-            DynamicDataSource.clearDataSource();
-            //切换数据源
-            dynamicDataSource.createDataSource(dataSourceVo);
-            return sysDictClassService.getAllSysDictClass();
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            //throw new RuntimeException(e);
-            return ResultTool.fail(ResultCode.COMMON_FAIL);
-        }
+        dynamicDataSource.createDataSource(dataSourceVo);
+        return sysDictClassService.getAllSysDictClass();
     }
     @PostMapping("/addSysDictClass")
-    public JsonResult addSysDictClass(SysDictClass sysDictClass){
+    public JsonResult addSysDictClass(SysDictClass sysDictClass,DataSourceVo dataSourceVo){
+        dynamicDataSource.createDataSource(dataSourceVo);
         return sysDictClassService.addSysDictClass(sysDictClass);
     }
     @PostMapping("/editSysDictClass")
-    public JsonResult editSysDictClass(SysDictClass sysDictClass){
+    public JsonResult editSysDictClass(SysDictClass sysDictClass,DataSourceVo dataSourceVo){
+        dynamicDataSource.createDataSource(dataSourceVo);
         return sysDictClassService.editSysDictClass(sysDictClass);
     }
     @PostMapping("/deleteSysDictClassByIds")
-    public JsonResult deleteSysDictClassByIds(@RequestParam Integer[] ids)
-    {
+    public JsonResult deleteSysDictClassByIds(Integer[] ids,DataSourceVo dataSourceVo){
+        dynamicDataSource.createDataSource(dataSourceVo);
         return sysDictClassService.deleteSysDictClassByIds(ids);
     }
 }

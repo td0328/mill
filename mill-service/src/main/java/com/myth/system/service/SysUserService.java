@@ -174,4 +174,8 @@ public class SysUserService {
         resultMap.put("sysUser",sysUser);//当前用户的菜单
         return ResultTool.success(resultMap);
     }
+    public JsonResult setEnabled(SysUser sysUser){
+        sysUserMapper.setEnabled(sysUser);
+        return ResultTool.success();
+    }
 }

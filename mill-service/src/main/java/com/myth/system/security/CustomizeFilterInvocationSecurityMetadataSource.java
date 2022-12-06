@@ -1,6 +1,7 @@
 package com.myth.system.security;
 
 import com.myth.system.bean.SysPermission;
+import com.myth.system.dataSource.DynamicDataSource;
 import com.myth.system.mapper.SysPermissionMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.ConfigAttribute;
@@ -31,6 +32,7 @@ public class CustomizeFilterInvocationSecurityMetadataSource implements FilterIn
         // 获取请求地址
         String requestUrl = ((FilterInvocation) o).getRequestUrl();
         String onlyUrl=requestUrl.substring(0,(requestUrl.lastIndexOf("?") > -1 ? requestUrl.lastIndexOf("?") : requestUrl.length()));
+
         // 查询具体某个接口的权限
         List<SysPermission> permissionList =  sysPermissionMapper.selectListByPath(onlyUrl);
         if(permissionList == null || permissionList.size() == 0){

@@ -7,10 +7,11 @@ import com.myth.system.bean.SysStateClass;
 import com.myth.system.dataSource.DataSourceVo;
 import com.myth.system.dataSource.DynamicDataSource;
 import com.myth.system.service.SysStateClassService;
-import com.myth.utils.JsonData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpSession;
 
 
 @Controller
@@ -23,45 +24,42 @@ public class SysStateClassController {
     private SysStateClassService sysStateClassService;
     @PostMapping("/getAllSysStateClass")
     public JsonResult getAllSysStateClass(DataSourceVo dataSourceVo){
-        try {
-            //切换数据源之前先清空
-            DynamicDataSource.clearDataSource();
-            //切换数据源
-            dynamicDataSource.createDataSource(dataSourceVo);
-            return sysStateClassService.getAllSysStateClass();
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            //throw new RuntimeException(e);
-            return ResultTool.fail();
-        }
+        dynamicDataSource.createDataSource(dataSourceVo);
+        return sysStateClassService.getAllSysStateClass();
     }
     @PostMapping("/addSysStateClass")
-    public JsonResult addSysStateClass(SysStateClass sysStateClass){
+    public JsonResult addSysStateClass(SysStateClass sysStateClass,DataSourceVo dataSourceVo){
+        dynamicDataSource.createDataSource(dataSourceVo);
         return sysStateClassService.addSysStateClass(sysStateClass);
     }
     @PostMapping("/editSysStateClass")
-    public JsonResult editSysStateClass(SysStateClass sysStateClass){
+    public JsonResult editSysStateClass(SysStateClass sysStateClass,DataSourceVo dataSourceVo){
+        dynamicDataSource.createDataSource(dataSourceVo);
         return sysStateClassService.editSysStateClass(sysStateClass);
     }
     @PostMapping("/deleteStateClassByIds")
-    public JsonResult deleteStateClassByIds(@RequestParam Integer[] ids){
+    public JsonResult deleteStateClassByIds(Integer[] ids,DataSourceVo dataSourceVo){
+        dynamicDataSource.createDataSource(dataSourceVo);
         return sysStateClassService.deleteStateClassByIds(ids);
     }
     @PostMapping("/getSysStateByClassId")
-    public JsonResult getSysStateByClassId(@RequestParam Integer classId){
+    public JsonResult getSysStateByClassId(Integer classId,DataSourceVo dataSourceVo){
+        dynamicDataSource.createDataSource(dataSourceVo);
         return sysStateClassService.getSysStateByClassId(classId);
     }
     @PostMapping("/addSysState")
-    public JsonResult addSysState(SysState sysState){
+    public JsonResult addSysState(SysState sysState,DataSourceVo dataSourceVo){
+        dynamicDataSource.createDataSource(dataSourceVo);
         return sysStateClassService.addSysState(sysState);
     }
     @PostMapping("/editSysState")
-    public JsonResult editSysState(SysState sysState){
+    public JsonResult editSysState(SysState sysState,DataSourceVo dataSourceVo){
+        dynamicDataSource.createDataSource(dataSourceVo);
         return sysStateClassService.editSysState(sysState);
     }
     @PostMapping("/deleteSysStateByIds")
-    public JsonResult deleteSysStateByIds(@RequestParam Integer[] ids,
-                                   @RequestParam Integer classId)
-    {
+    public JsonResult deleteSysStateByIds(Integer[] ids,Integer classId,DataSourceVo dataSourceVo){
+        dynamicDataSource.createDataSource(dataSourceVo);
         return sysStateClassService.deleteSysStateByIds(ids,classId);
     }
 }

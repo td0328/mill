@@ -11,7 +11,8 @@ spring:
     proxy-target-class: true  #true为使用CGLIB代理,AOP动态代理
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/jraz?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://localhost:3306/mill?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+    name: mill
     username: root
     password: qsxs00Fq
     dataType: mysql  # 可选值 mysql oracle sqlserver postgresql
@@ -19,6 +20,7 @@ spring:
     druid:
       test-while-idle: false
       validation-query: select 1
+
   mvc:
     hiddenmethod:
       filter:
