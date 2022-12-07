@@ -65,6 +65,7 @@ public class SysTableService {
             for (Column oidColumn:oidColumnAllConfig) {
                 if (oidColumn.getColumnName().equals(columnName)) {
                     if (!oidColumn.getDataType().equals(tableColumn.getDataType())){
+                        System.out.println(oidColumn.getDataType()+":"+tableColumn.getDataType());
                         //清空列配置
                         column = TableConfigAnalysis.initColumn(tableColumn,sysKeyColumnUsage,new Column());
                         column.setColumnName(columnName);

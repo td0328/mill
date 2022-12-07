@@ -20,6 +20,8 @@ spring:
     druid:
       test-while-idle: false
       validation-query: select 1
+      max-active: 2
+      initial-size: 1
 
   mvc:
     hiddenmethod:

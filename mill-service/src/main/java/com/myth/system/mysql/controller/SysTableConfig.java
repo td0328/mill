@@ -64,7 +64,8 @@ public class SysTableConfig {
         return tableService.getColumnTypeData(tableName,columnName);
     }
     @PostMapping("/mysql/editColumnConfig")
-    public JsonResult editColumnConfig(Column column,DataSourceVo dataSourceVo){
+    public JsonResult editColumnConfig(Column column,DataSourceVo dataSourceVo,String columnDateType){
+        column.setDataType(columnDateType);
         dynamicDataSource.createDataSource(dataSourceVo);
         return tableService.editColumnConfig(column);
     }

@@ -68,6 +68,10 @@ public class DynamicDataSource extends AbstractRoutingDataSource {
     public boolean createDataSource(DataSourceVo dataSourceVo) {
         try {
             clearDataSource();
+            for(Object key:this.dynamicTargetDataSources.keySet()){
+                DruidDataSource druidDataSource = (DruidDataSource)this.dynamicTargetDataSources.get(key);
+                druidDataSource.close();
+            }
             String driveName = null;
             String url = null;
             if(dataSourceVo!=null){
@@ -95,7 +99,7 @@ public class DynamicDataSource extends AbstractRoutingDataSource {
                 dataSourceVo.setUsername(dataBaseConfig.get("username").toString());
                 dataSourceVo.setPassword(dataBaseConfig.get("password").toString());
             }
-            testConnection(driveName, url, dataSourceVo.getUsername(), dataSourceVo.getPassword());
+            //testConnection(driveName, url, dataSourceVo.getUsername(), dataSourceVo.getPassword());
 
             // 通过Druid数据库连接池连接数据库
             DruidDataSource dataSource = new DruidDataSource();
@@ -110,11 +114,14 @@ public class DynamicDataSource extends AbstractRoutingDataSource {
 
             // 数据源初始化
             try {
+
                 dataSource.init();
+
             } catch (SQLException e) {
                 // 创建失败则抛出异常
                 throw new RuntimeException();
             }
+
             //获取当前数据源的键值对存入Map
             this.dynamicTargetDataSources.put(dataSourceVo.getKey(), dataSource);
             // 设置数据源
@@ -128,7 +135,7 @@ public class DynamicDataSource extends AbstractRoutingDataSource {
              * ！！！重要，不修改mybatis的数据源的话，
              * 即使切换了数据源之后还是会出现默认数据源的情况
              */
-            SqlSessionFactory SqlSessionFactory = (SqlSessionFactory) SpringContextUtils.getBean(SqlSessionFactory.class);
+            SqlSessionFactory SqlSessionFactory = SpringContextUtils.getBean(SqlSessionFactory.class);
             Environment environment =SqlSessionFactory.getConfiguration().getEnvironment();
             Field dataSourceField = environment.getClass().getDeclaredField("dataSource");
             //跳过检验
