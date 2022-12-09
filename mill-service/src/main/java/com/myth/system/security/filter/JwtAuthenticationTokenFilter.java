@@ -34,8 +34,6 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
      * */
     @Autowired
     private SecurityUserService userDetailsService;
-    @Autowired
-    private DynamicDataSource dynamicDataSource;
 
     @Override
     protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {
@@ -67,6 +65,7 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
             }
 
         }
+
         // 放行给下个过滤器
         filterChain.doFilter(httpServletRequest, httpServletResponse);
     }

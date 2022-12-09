@@ -1,9 +1,12 @@
 package com.myth.system.dataSource;
 
 import com.alibaba.druid.pool.DruidDataSource;
+import com.alibaba.fastjson2.JSON;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.yaml.snakeyaml.Yaml;
 
@@ -37,6 +40,9 @@ public class DataSourceConfig {
     @Value("${spring.datasource.dataType}")
     private String dataType;
 
+    @Autowired
+    private Environment environment;
+
     // 创建DynamicDataSource的bean交给SpringIOC容器管理
     @Bean(name = "dynamicDataSource")
     public DynamicDataSource dataSource() {
@@ -60,27 +66,45 @@ public class DataSourceConfig {
 
     // 获取数据源的驱动信息
     public Map<String, Object> getDataBaseConfig() {
-        Map<String, Object> map = getYaml();
         //这里通过Map的方式获取到yaml文件里面的dataType是哪一个
-        Map<String, Object> dataBaseConfig = (Map<String, Object>) map.get("datatype");
+        Map<String, Object> dataBaseConfig = new HashMap<>();
+        Map<String,String> mysql = new HashMap<>();
+        mysql.put("driverClassName",environment.getProperty("datatype.mysql.driverClassName"));
+        mysql.put("url",environment.getProperty("datatype.mysql.url"));
+        dataBaseConfig.put("mysql",mysql);
+
+        Map<String,String> clickhouse = new HashMap<>();
+        clickhouse.put("driverClassName",environment.getProperty("datatype.clickhouse.driverClassName"));
+        clickhouse.put("url",environment.getProperty("datatype.clickhouse.url"));
+        dataBaseConfig.put("clickhouse",clickhouse);
+
+        Map<String,String> sqlserver = new HashMap<>();
+        sqlserver.put("driverClassName",environment.getProperty("datatype.sqlserver.driverClassName"));
+        sqlserver.put("url",environment.getProperty("datatype.sqlserver.url"));
+        dataBaseConfig.put("sqlserver",sqlserver);
+
+        Map<String,String> postgresql = new HashMap<>();
+        postgresql.put("driverClassName",environment.getProperty("datatype.postgresql.driverClassName"));
+        postgresql.put("url",environment.getProperty("datatype.postgresql.url"));
+        dataBaseConfig.put("postgresql",postgresql);
+
         return dataBaseConfig;
     }
-    public Map<String, Object> getDefaultDataBase() {
-        Map<String, Object> map = getYaml();
+    public Map<String, String> getDefaultDataBase() {
+        //System.out.println("数据库配置："+ JSON.toJSONString(defaultDatabase));
         //这里通过Map的方式获取到yaml文件里面的dataType是哪一个
-        Map<String, Object> dataBaseConfig = (Map<String, Object>)((Map<String, Object>) map.get("spring")).get("datasource");
+        Map<String, String> dataBaseConfig = new HashMap<>();
+        String driverClassName =  environment.getProperty("spring.datasource.driverClassName");
+        dataBaseConfig.put("driverClassName",driverClassName);
+        String url =  environment.getProperty("spring.datasource.url");
+        dataBaseConfig.put("url",url);
+        String name =  environment.getProperty("spring.datasource.name");
+        dataBaseConfig.put("name",name);
+        String username =  environment.getProperty("spring.datasource.username");
+        dataBaseConfig.put("username",username);
+        String password =  environment.getProperty("spring.datasource.password");
+        dataBaseConfig.put("password",password);
+
         return dataBaseConfig;
-    }
-    //获取Yaml
-    public Map<String, Object> getYaml() {
-        //获取Yaml
-        Yaml yaml = new Yaml();
-        Map<String, Object> map;
-        try {
-            map = yaml.load(new FileInputStream(System.getProperty("user.dir") + "\\mill-service\\src\\main\\resources\\application.yml"));
-        } catch (IOException e) {
-            throw new RuntimeException("SYS_PATH_ERROR");
-        }
-        return map;
     }
 }

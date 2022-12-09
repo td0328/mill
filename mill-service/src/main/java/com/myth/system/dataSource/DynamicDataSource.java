@@ -68,10 +68,10 @@ public class DynamicDataSource extends AbstractRoutingDataSource {
     public boolean createDataSource(DataSourceVo dataSourceVo) {
         try {
             clearDataSource();
-            for(Object key:this.dynamicTargetDataSources.keySet()){
-                DruidDataSource druidDataSource = (DruidDataSource)this.dynamicTargetDataSources.get(key);
-                druidDataSource.close();
-            }
+            //for(Object key:this.dynamicTargetDataSources.keySet()){
+            //    DruidDataSource druidDataSource = (DruidDataSource)this.dynamicTargetDataSources.get(key);
+            //    druidDataSource.close();
+            //}
             String driveName = null;
             String url = null;
             if(dataSourceVo!=null){
@@ -88,38 +88,42 @@ public class DynamicDataSource extends AbstractRoutingDataSource {
                 url = dataConfig.get("url").replaceAll("\\{IP}", dataSourceVo.getUrl())
                         .replaceAll("\\{port}", dataSourceVo.getPort())
                         .replaceAll("\\{database}",dataSourceVo.getDataName());
+
                 // 测试连接
             }else{
-                Map<String, Object> dataBaseConfig = dataSourceConfig.getDefaultDataBase();
-                driveName = dataBaseConfig.get("driverClassName").toString();
-                url = dataBaseConfig.get("url").toString();
+                Map<String, String> dataBaseConfig = dataSourceConfig.getDefaultDataBase();
+                driveName = dataBaseConfig.get("driverClassName");
+                url = dataBaseConfig.get("url");
                 dataSourceVo = new DataSourceVo();
                 dataSourceVo.setKey("default");
-                dataSourceVo.setDataName(dataBaseConfig.get("name").toString());
-                dataSourceVo.setUsername(dataBaseConfig.get("username").toString());
-                dataSourceVo.setPassword(dataBaseConfig.get("password").toString());
+                dataSourceVo.setDataName(dataBaseConfig.get("name"));
+                dataSourceVo.setUsername(dataBaseConfig.get("username"));
+                dataSourceVo.setPassword(dataBaseConfig.get("password"));
             }
             //testConnection(driveName, url, dataSourceVo.getUsername(), dataSourceVo.getPassword());
 
             // 通过Druid数据库连接池连接数据库
-            DruidDataSource dataSource = new DruidDataSource();
-            //接收前端传递的参数并且注入进去
-            dataSource.setName(dataSourceVo.getDataName());
-            dataSource.setUrl(url);
-            dataSource.setUsername(dataSourceVo.getUsername());
-            dataSource.setPassword(dataSourceVo.getPassword());
-            dataSource.setDriverClassName(driveName);
-            // 设置最大连接等待时间
-            dataSource.setMaxWait(4000);
+            DruidDataSource dataSource;
+            if(this.dynamicTargetDataSources.get(dataSourceVo.getKey())!=null){
+                dataSource = (DruidDataSource)this.dynamicTargetDataSources.get(dataSourceVo.getKey());
+            }else{
+                dataSource = new DruidDataSource();
+                //接收前端传递的参数并且注入进去
+                dataSource.setName(dataSourceVo.getDataName());
+                dataSource.setUrl(url);
+                dataSource.setUsername(dataSourceVo.getUsername());
+                dataSource.setPassword(dataSourceVo.getPassword());
+                dataSource.setDriverClassName(driveName);
+                // 设置最大连接等待时间
+                dataSource.setMaxWait(4000);
 
-            // 数据源初始化
-            try {
-
-                dataSource.init();
-
-            } catch (SQLException e) {
-                // 创建失败则抛出异常
-                throw new RuntimeException();
+                // 数据源初始化
+                try {
+                    dataSource.init();
+                } catch (SQLException e) {
+                    // 创建失败则抛出异常
+                    throw new RuntimeException();
+                }
             }
 
             //获取当前数据源的键值对存入Map
